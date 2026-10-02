@@ -129,3 +129,27 @@ const DB_DIACRITICA = [
   { con:'cuándo', sin:'cuando', conSig:'pregunta por el tiempo (¿cuándo llegas?)', sinSig:'señala un momento, sin preguntar (cuando llegues, avísame)',
     frases:[['¿___ es tu cumpleaños?','con'],['___ termine la clase, salimos al patio.','sin'],['Avísame ___ llegues a tu casa.','sin'],['Pregúntale ___ es el examen.','con']] }
 ];
+
+/* =====================================================================
+   DETECTIVE DE TILDES
+   Escribe cada texto BIEN ACENTUADO. El juego le quita todas las
+   tildes y el alumno debe encontrar dónde iban.
+   ===================================================================== */
+const DB_DETECTIVE = [
+  { titulo:'Paseo por el malecón',
+    texto:'El sábado fuimos al malecón de Campeche. Mi papá compró un helado de limón y mi mamá tomó muchas fotografías del atardecer. Después caminamos hasta el baluarte y escuchamos la música de una banda.' },
+  { titulo:'La clase de Matemáticas',
+    texto:'Ayer en la clase de Matemáticas el maestro explicó cómo se calcula el área de un triángulo. Yo no entendí al principio, pero mi compañera me ayudó con un ejemplo fácil y al final resolví todos los ejercicios.' },
+  { titulo:'¿Qué harías tú?',
+    texto:'¿Qué harías si encontraras un teléfono en la calle? Lo más honesto es buscar a su dueño. Tú puedes llevarlo a la dirección de la escuela o pedirle ayuda a un policía.' },
+  { titulo:'El café de la abuela',
+    texto:'Mi abuela dice que el café de olla sabe mejor en diciembre. Lo prepara con canela y piloncillo, y siempre nos sirve una taza después de la cena. A mí me gusta más el chocolate. También prepara tamales de chaya.' },
+  { titulo:'El murciélago',
+    texto:'El murciélago es un animal nocturno. Aunque mucha gente le tiene miedo, ayuda a controlar los insectos y a polinizar algunas plantas, como el agave. Los científicos estudian cómo se orienta en la oscuridad. Sin él, el ecosistema perdería su equilibrio.' },
+  { titulo:'El día del examen',
+    texto:'Cuando llegó el día del examen, Luis estaba nervioso. Repasó sus apuntes, respiró profundo y escribió su nombre. Al terminar, la maestra le dijo: «Sé que te esforzaste mucho». Luis sonrió.' },
+  { titulo:'Edzná',
+    texto:'La pirámide de Edzná es una joya de la cultura maya. Los mayas observaban el Sol y las estrellas con mucha precisión, y crearon un calendario más exacto que el de los europeos de su época.' },
+  { titulo:'Un buen hábito',
+    texto:'Él siempre llega temprano a la escuela. Antes de entrar, saluda al conserje, revisa su mochila y se asegura de traer su lápiz, su cuaderno y su botella de agua. ¡Qué buen hábito!' }
+];

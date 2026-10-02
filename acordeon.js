@@ -209,6 +209,38 @@ const AC_CSS = `
 .mx-input{text-align:center;font-size:1.6rem!important;margin:12px 0 6px!important;}
 .mx-teclas{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
 .mx-teclas button{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.25rem;width:40px;height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;}
+.ac-envio{text-align:left;}
+.ac-envio summary{font-family:'Fredoka One',cursive;color:var(--amarillo);font-size:1.1rem;cursor:pointer;}
+.ac-envio summary small{font-family:'Nunito',sans-serif;color:#b3e5fc;font-size:.75rem;}
+.ac-envio input[type=text]{width:calc(50% - 14px);}
+.ac-envio .ac-p{margin-top:10px;}
+.ac-estado{font-weight:700;color:#b3e5fc;font-size:.85rem;margin:8px 0;}
+.dt-titulo{font-family:'Fredoka One',cursive;color:var(--amarillo);font-size:1.2rem;margin-bottom:8px;}
+.dt-texto{font-family:'Nunito',sans-serif;font-weight:700;font-size:clamp(1.05rem,4.4vw,1.35rem);line-height:2;text-align:left;color:#e1f5fe;}
+.dt-pal{cursor:pointer;border-radius:6px;padding:1px 0;}
+.dt-pal:hover{background:rgba(255,215,0,.15);}
+.dt-pal.sel{outline:2px solid var(--amarillo);}
+.dt-pal.marcada{color:#ffab40;background:rgba(255,109,0,.18);}
+.dt-pal.bien{color:#69f0ae;background:rgba(0,200,83,.18);cursor:default;}
+.dt-pal.falto{color:#ff8a80;background:rgba(255,82,82,.18);cursor:default;}
+.dt-pal.sobra{color:#ffab40;background:rgba(255,145,0,.18);cursor:default;}
+.dt-pal s{opacity:.6;}
+.dt-picker{background:rgba(0,0,0,.3);border:2px solid var(--amarillo);border-radius:16px;padding:10px;margin:10px 0;}
+.dt-letra{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.6rem,7vw,2.4rem);color:#90a4ae;padding:4px 2px;}
+.dt-leyenda{margin:8px 0;font-size:.85rem;font-weight:700;}
+.dt-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.dt-chip{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;padding:6px 12px;border-radius:50px;border:2px solid rgba(0,229,255,.5);background:rgba(0,229,255,.1);color:#e1f5fe;cursor:pointer;}
+#dt-acc{margin-top:10px;}
+.ac-panel{background:rgba(124,77,255,.12);border:2px solid rgba(124,77,255,.4);border-radius:14px;padding:12px 14px;margin:0 0 16px;text-align:left;}
+.ac-panel h3{font-family:'Fredoka One',cursive;color:var(--amarillo);margin-bottom:4px;}
+.ac-panel p{margin:4px 0;color:#e1f5fe;font-size:.9rem;}
+.ac-barras{margin:8px 0;}
+.ac-barra{display:grid;grid-template-columns:minmax(110px,40%) 1fr 40px;gap:8px;align-items:center;font-size:.82rem;margin:4px 0;}
+.ac-barra div{height:12px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;}
+.ac-barra i{display:block;height:100%;background:linear-gradient(90deg,#ff5252,#ff9100);}
+.ac-barra i.prom{background:linear-gradient(90deg,#00e5ff,#69f0ae);}
+.ac-barra b{color:var(--amarillo);text-align:right;}
+.ac-nota{font-size:.75rem!important;color:#90a4ae!important;}
 @media (prefers-reduced-motion: reduce){.ac-col.fuelle,.ac-sil.cae,.ac-sil.mal{animation:none!important;}}
 `;
 
@@ -218,6 +250,13 @@ const AC_HTML = `
   <div id="ac-inicio" class="ac-vista">
     <div class="ac-titulo">🪗 Mi Acordeón de Tildes</div>
     <div class="ac-sub">Divide la palabra, acomódala, encuentra la sílaba fuerte y deja que la regla decida.</div>
+    <details class="form-card ac-envio" id="ac-envio">
+      <summary>📋 Enviar mis resultados al profe <small>(opcional)</small></summary>
+      <p class="ac-p">Si tu profe te dio un código de sesión, escríbelo y cada ronda que termines le llegará.</p>
+      <input type="text" id="ac-nombre" placeholder="Tu nombre" onchange="acRecordarAlumno()">
+      <input type="text" id="ac-grupo" placeholder="Tu grupo" onchange="acRecordarAlumno()">
+      <input type="text" id="ac-codigo" class="input-full" placeholder="Código de sesión (ej. AB3K7Q)" style="text-transform:uppercase;" onchange="acRecordarAlumno()">
+    </details>
     <div class="form-card">
       <h2>🎒 Práctica</h2>
       <p class="ac-p">Elige tu nivel. Cada ronda tiene 10 palabras.</p>
@@ -229,6 +268,7 @@ const AC_HTML = `
         <button class="ac-nivel" onclick="mxIniciar('cambia')"><span class="num">🔀</span><span>La tilde cambia el significado<small class="mx-desc">término, termino, terminó</small></span></button>
         <button class="ac-nivel" onclick="mxIniciar('dictado')"><span class="num">🎧</span><span>Dictado<small class="mx-desc">escucha y escribe con tilde</small></span></button>
         <button class="ac-nivel" onclick="mxIniciar('diacritica')"><span class="num">✋</span><span>Tilde diacrítica<small class="mx-desc">tú / tu, sí / si, qué / que…</small></span></button>
+        <button class="ac-nivel" onclick="dtIniciar()"><span class="num">🕵️</span><span>Detective de tildes<small class="mx-desc">encuentra las tildes que faltan en un texto</small></span></button>
       </div>
     </div>
     <div class="form-card">
@@ -271,6 +311,7 @@ const AC_HTML = `
         <div><b id="ac-fin-racha">0</b><small>mejor racha</small></div>
       </div>
       <div class="diagnostico-txt" id="ac-fin-diag"></div>
+      <div class="ac-estado" id="ac-estado-envio"></div>
       <div class="pz-fila">
         <button class="btn-accion btn-guardar" onclick="acIniciarNivel(acEstado.nivel)">🔁 Repetir nivel</button>
         <button class="btn-accion btn-guardar" id="ac-fin-sig" onclick="acIniciarNivel(acEstado.nivel+1)">Siguiente nivel</button>
@@ -403,6 +444,8 @@ function acIniciarNivel(k){
   Object.assign(acEstado, { nivel:k, ronda:acArmarRonda(k), i:0, puntos:0, racha:0, maxRacha:0, perfectas:0,
     err:{ cortar:0, tonica:0, tipo:0, termina:0, regla:0, tildar:0 } });
   document.getElementById('ac-hud-nivel').innerText = 'NIVEL ' + (k + 1);
+  acRecordarAlumno();
+  document.getElementById('ac-estado-envio').innerText = '';
   acVista('ac-practica');
   iniciarMusica('estudio');
   acSiguientePalabra();
@@ -691,6 +734,9 @@ function acFinal(){
   let peor = null, max = 0;
   for(const k in E.err){ if(E.err[k] > max){ max = E.err[k]; peor = k; } }
   document.getElementById('ac-fin-diag').innerText = peor ? '📌 Para reforzar: ' + AC_DIAG[peor] + '.' : '🌟 ¡Sin un solo error!';
+  acGuardar({ juego:'Nivel ' + (E.nivel + 1) + ' · ' + AC_NIVELES[E.nivel].nombre, aciertos:E.perfectas, total:E.ronda.length,
+    calificacion:E.perfectas / E.ronda.length * 10, score:E.puntos, maxRacha:E.maxRacha, errores:E.err,
+    diagnostico: peor ? 'Reforzar: ' + AC_DIAG[peor] : 'Sin errores' });
   const sig = document.getElementById('ac-fin-sig');
   sig.style.display = E.nivel < AC_NIVELES.length - 1 ? 'inline-block' : 'none';
   acVista('ac-final');
@@ -834,6 +880,7 @@ function mxArmar(modo){
 }
 
 function mxIniciar(modo){
+  acRecordarAlumno();
   Object.assign(mx, { modo, items:mxArmar(modo), i:0, pts:0, aciertos:0, racha:0, maxRacha:0 });
   mxEl('mx-titulo').innerText = MX_MODOS[modo].titulo;
   mxEl('mx-pts').innerText = '0';
@@ -995,6 +1042,195 @@ function mxFinal(){
   mxEl('mx-opc').innerHTML = '<div class="pz-fila"><button class="btn-accion btn-guardar" onclick="mxIniciar(mx.modo)">🔁 Otra ronda</button>'
     + '<button class="btn-accion btn-volver" onclick="acSalir()">← Mi Acordeón</button></div>';
   mxEl('mx-prog').innerText = '';
+  mxEl('mx-vis').innerHTML = '<div class="ac-estado" id="mx-estado"></div>';
+  const nombres = { cambia:'La tilde cambia el significado', dictado:'Dictado', diacritica:'Tilde diacrítica' };
+  acGuardar({ juego:nombres[mx.modo], aciertos:mx.aciertos, total:n, calificacion:mx.aciertos / n * 10, score:mx.pts, maxRacha:mx.maxRacha,
+    diagnostico:mx.aciertos + ' de ' + n + ' correctas' }, 'mx-estado');
+}
+
+/* ---------------- DETECTIVE DE TILDES ---------------- */
+const DT_SIN = { 'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U' };
+const DT_CON = { 'a':'á','e':'é','i':'í','o':'ó','u':'ú','A':'Á','E':'É','I':'Í','O':'Ó','U':'Ú' };
+function dtSinTilde(s){ return s.replace(/[áéíóúÁÉÍÓÚ]/g, c => DT_SIN[c]); }
+const dt = { texto:null, tokens:[], sel:-1, revisado:false, ultimo:-1 };
+
+function dtIniciar(){
+  acRecordarAlumno();
+  mx.modo = 'detective';
+  let k; do { k = Math.floor(Math.random() * DB_DETECTIVE.length); } while(DB_DETECTIVE.length > 1 && k === dt.ultimo);
+  dt.ultimo = k; dt.texto = DB_DETECTIVE[k];
+  dt.tokens = dt.texto.texto.split(/([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)/).filter(x => x !== '').map(t => {
+    const esPal = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+$/.test(t);
+    return { t, esPal, orig:t, vista:esPal ? dtSinTilde(t) : t, resp:esPal ? dtSinTilde(t) : t, objetivo:esPal && /[áéíóúÁÉÍÓÚ]/.test(t) };
+  });
+  dt.sel = -1; dt.revisado = false;
+  mxEl('mx-titulo').innerText = 'DETECTIVE';
+  mxEl('mx-pts').innerText = '0';
+  mxEl('mx-prog').innerText = 'Caso ' + (k + 1);
+  mxEl('mx-combo').innerText = '';
+  acVista('ac-mas');
+  iniciarMusica('estudio');
+  mxLimpiar();
+  mxEl('mx-coach').innerHTML = '🕵️ A este texto le borraron <b>todas las tildes</b>. Toca cada palabra que debería llevarla y elige la vocal. Cuando termines, presiona <b>Revisar</b>.';
+  dtPintar();
+  mxEl('mx-opc').innerHTML = '<div class="ac-opciones" style="grid-template-columns:1fr;"><button class="opt" onclick="dtRevisar()">🔎 Revisar</button></div>';
+}
+function dtPintar(){
+  const h = dt.tokens.map((x, i) => {
+    if(!x.esPal) return x.t;
+    let cls = 'dt-pal';
+    if(!dt.revisado){
+      if(x.resp !== x.vista) cls += ' marcada';
+      if(i === dt.sel) cls += ' sel';
+      return '<span class="' + cls + '" onclick="dtTocar(' + i + ')">' + x.resp + '</span>';
+    }
+    if(x.objetivo && x.resp === x.orig) return '<span class="dt-pal bien">' + x.orig + '</span>';
+    if(x.objetivo) return '<span class="dt-pal falto" title="Le faltaba la tilde"><s>' + x.resp + '</s> ' + x.orig + '</span>';
+    if(x.resp !== x.vista) return '<span class="dt-pal sobra"><s>' + x.resp + '</s> ' + x.orig + '</span>';
+    return x.t;
+  }).join('');
+  const titulo = dt.revisado ? dt.texto.titulo : '🕵️ Caso ' + (dt.ultimo + 1);
+  mxEl('mx-card').innerHTML = '<div class="dt-titulo">' + titulo + '</div><div class="dt-texto">' + h + '</div>';
+}
+function dtTocar(i){
+  if(dt.revisado) return;
+  dt.sel = i; dtPintar();
+  const x = dt.tokens[i], letras = [...x.vista];
+  mxEl('mx-card').insertAdjacentHTML('beforeend', '<div class="dt-picker" id="dt-picker"><div class="ac-pregunta">¿Dónde va la tilde en «' + x.vista + '»?</div><div class="ac-vocales">'
+    + letras.map((l, j) => /[aeiouAEIOU]/.test(l)
+        ? '<button class="ac-vocal" onclick="dtPoner(' + i + ',' + j + ')">' + l + '</button>'
+        : '<span class="dt-letra">' + l + '</span>').join('')
+    + '</div><div class="pz-fila"><button class="btn-accion btn-volver" onclick="dtPoner(' + i + ',-1)">No lleva tilde</button></div></div>');
+  const pk = document.getElementById('dt-picker'); if(pk && pk.scrollIntoView) pk.scrollIntoView({ block:'nearest', behavior:'smooth' });
+}
+function dtPoner(i, j){
+  const x = dt.tokens[i];
+  if(j < 0) x.resp = x.vista;
+  else { const l = [...x.vista]; l[j] = DT_CON[l[j]] || l[j]; x.resp = l.join(''); }
+  dt.sel = -1;
+  dtPintar();
+}
+function dtExplicar(pal){
+  const p = pal.toLowerCase();
+  const d = (typeof DB_DIACRITICA !== 'undefined') ? DB_DIACRITICA.find(x => x.con === p) : null;
+  if(d) return { w:null, html:'«<b>' + pal + '</b>» lleva <b>tilde diacrítica</b>: aquí es ' + d.conSig + '. Sin tilde, «' + d.sin + '» sería ' + d.sinSig + '.' };
+  const sil = acSilabear(p);
+  if(sil.length < 2) return { w:null, html:'«<b>' + pal + '</b>» lleva tilde diacrítica.' };
+  const w = acAnalizar(sil);
+  return { w, html:acExplicar(w) };
+}
+function dtVer(pal){
+  const e = dtExplicar(pal);
+  mxEl('mx-coach').innerHTML = '🔎 ' + e.html;
+  const cont = document.getElementById('dt-acc');
+  if(cont){
+    if(e.w){ cont.style.display = 'flex'; acRenderAcordeon(cont, e.w, { silabas:true, tonica:true, final:true, animar:true }); }
+    else { cont.style.display = 'none'; cont.innerHTML = ''; }
+  }
+}
+function dtRevisar(){
+  if(dt.revisado) return;
+  dt.revisado = true; dt.sel = -1;
+  const pals = dt.tokens.filter(x => x.esPal);
+  const obj = pals.filter(x => x.objetivo);
+  const bien = obj.filter(x => x.resp === x.orig).length;
+  const sobran = pals.filter(x => !x.objetivo && x.resp !== x.vista).length;
+  const total = obj.length;
+  const pts = Math.max(0, bien * 20 - sobran * 10);
+  const calif = Math.max(0, (bien - sobran) / total * 10);
+  (bien === total && sobran === 0) ? sfxCorrecto() : sfxIncorrecto();
+  mxEl('mx-pts').innerText = pts;
+  dtPintar();
+  const faltan = obj.filter(x => x.resp !== x.orig);
+  mxEl('mx-opc').innerHTML = '<div class="ac-res"><div><b>' + bien + '/' + total + '</b><small>tildes encontradas</small></div>'
+    + '<div><b>' + sobran + '</b><small>sobraron</small></div><div><b>' + calif.toFixed(1) + '</b><small>calificación</small></div></div>';
+  const lista = obj.map(x => x.orig);
+  mxEl('mx-vis').innerHTML = '<div class="dt-leyenda"><span class="dt-pal bien">bien</span> <span class="dt-pal falto">faltó</span> <span class="dt-pal sobra">sobró</span></div>'
+    + '<div class="label-mini" style="text-align:center;margin:10px 0 6px;">Toca una palabra para ver por qué lleva tilde</div>'
+    + '<div class="dt-chips">' + [...new Set(lista)].map(p => '<button class="dt-chip" onclick="dtVer(\'' + p + '\')">' + p + '</button>').join('') + '</div>'
+    + '<div class="ac-acordeon ac-mini" id="dt-acc" style="display:none;"></div>'
+    + '<div class="ac-estado" id="dt-estado"></div>'
+    + '<div class="pz-fila" style="margin-top:12px;"><button class="btn-accion btn-guardar" onclick="dtIniciar()">🕵️ Otro texto</button><button class="btn-accion btn-volver" onclick="acSalir()">← Mi Acordeón</button></div>';
+  mxEl('mx-coach').innerHTML = faltan.length === 0 && sobran === 0
+    ? '🏆 <b>¡Caso resuelto!</b> Encontraste todas las tildes sin equivocarte.'
+    : '🕵️ Revisa las palabras en rojo (les faltó tilde) y en naranja (no la llevaban). Toca cualquiera de abajo para ver su acordeón.';
+  acGuardar({ juego:'Detective', aciertos:bien, total, calificacion:calif, score:pts, maxRacha:0,
+    errores:{ faltaron:faltan.length, sobraron:sobran },
+    diagnostico: faltan.length ? 'Le faltó tilde en: ' + faltan.map(x => x.orig).join(', ') : (sobran ? 'Puso tilde de más ' + sobran + ' vez/veces' : 'Sin errores') }, 'dt-estado');
+}
+
+/* ---------------- RESULTADOS PARA EL PROFE (Firebase) ---------------- */
+function acDatosAlumno(){
+  const g = id => (document.getElementById(id) || {}).value || '';
+  return { nombre:g('ac-nombre').trim(), grupo:g('ac-grupo').trim(), codigo:g('ac-codigo').trim().toUpperCase() };
+}
+function acRecordarAlumno(){
+  try { localStorage.setItem('tildate_ac_alumno', JSON.stringify(acDatosAlumno())); } catch(e){}
+}
+function acCargarAlumno(){
+  let d = {};
+  try { d = JSON.parse(localStorage.getItem('tildate_ac_alumno') || '{}'); } catch(e){}
+  const nom = d.nombre || (document.getElementById('nombre') || {}).value || '';
+  const grp = d.grupo || (document.getElementById('grupo') || {}).value || '';
+  document.getElementById('ac-nombre').value = nom;
+  document.getElementById('ac-grupo').value = grp;
+  document.getElementById('ac-codigo').value = d.codigo || '';
+  if(d.codigo) document.getElementById('ac-envio').open = true;
+}
+function acGuardar(r, idEstado){
+  const a = acDatosAlumno();
+  const estado = document.getElementById(idEstado || 'ac-estado-envio');
+  const aviso = txt => { if(estado) estado.innerText = txt; };
+  if(!a.codigo){ aviso('Sin código de sesión: este resultado no se envió a tu profe.'); return; }
+  if(typeof db === 'undefined'){ aviso('⚠️ No hay conexión con la base de datos.'); return; }
+  const ref = db.collection('sesiones').doc(a.codigo);
+  ref.get().then(doc => {
+    if(!doc.exists){ showToast('❌ Ese código de sesión no existe'); aviso('❌ El código «' + a.codigo + '» no existe. Pídeselo de nuevo a tu profe.'); return; }
+    return ref.collection('resultados').add({
+      app:'acordeon', juego:r.juego,
+      nombre:a.nombre || 'Alumno', grupo:a.grupo || '—', modo:'Acordeón · ' + r.juego,
+      aciertos:r.aciertos, total:r.total, calificacion:parseFloat(Math.min(10, Math.max(0, r.calificacion)).toFixed(1)),
+      score:r.score, maxRacha:r.maxRacha || 0, errores:r.errores || {}, diagnostico:r.diagnostico || '',
+      fecha:new Date().toLocaleDateString('es-MX') + ' ' + new Date().toLocaleTimeString('es-MX')
+    }).then(() => { showToast('✅ Resultado enviado a tu profe'); aviso('✅ Enviado a tu profe.'); });
+  }).catch(() => { showToast('⚠️ No se pudo enviar. Revisa tu internet.'); aviso('⚠️ No se pudo enviar. Revisa tu internet.'); });
+}
+
+/* Resumen del acordeón dentro del Panel Docente */
+const AC_PASO_NOMBRE = { cortar:'Cortar sílabas', tonica:'Sílaba tónica', tipo:'Tipo de palabra', termina:'Última letra', regla:'Aplicar la regla', tildar:'Poner la tilde' };
+function acResumenDocente(data){
+  let el = document.getElementById('ac-resumen-docente');
+  if(!el){
+    const ref = document.getElementById('resumen');
+    if(!ref) return;
+    el = document.createElement('div'); el.id = 'ac-resumen-docente';
+    ref.parentNode.insertBefore(el, ref.nextSibling);
+  }
+  const ac = (data || []).filter(d => d.app === 'acordeon');
+  if(!ac.length){ el.innerHTML = ''; return; }
+  const alumnos = new Set(ac.map(d => d.nombre + '|' + d.grupo)).size;
+  const pasos = { cortar:0, tonica:0, tipo:0, termina:0, regla:0, tildar:0 };
+  ac.filter(d => d.juego && d.juego.indexOf('Nivel') === 0).forEach(d => { for(const k in pasos) pasos[k] += (d.errores && d.errores[k]) || 0; });
+  const totalErr = Object.values(pasos).reduce((a, b) => a + b, 0);
+  const juegos = {};
+  ac.forEach(d => { const j = (d.juego || '').replace(/^Nivel \d.*/, 'Práctica por niveles'); (juegos[j] = juegos[j] || []).push(d.calificacion || 0); });
+  let h = '<div class="ac-panel"><h3>🪗 Mi Acordeón</h3><p>' + ac.length + ' rondas de ' + alumnos + ' alumno(s).</p>';
+  if(totalErr > 0){
+    const max = Math.max(...Object.values(pasos));
+    const peor = Object.keys(pasos).find(k => pasos[k] === max);
+    h += '<p><b>Lo que más le cuesta al grupo: ' + AC_PASO_NOMBRE[peor].toLowerCase() + '.</b></p><div class="ac-barras">';
+    for(const k in pasos){
+      const pct = Math.round(pasos[k] / totalErr * 100);
+      h += '<div class="ac-barra"><span>' + AC_PASO_NOMBRE[k] + '</span><div><i style="width:' + pct + '%"></i></div><b>' + pasos[k] + '</b></div>';
+    }
+    h += '</div>';
+  }
+  h += '<div class="ac-barras">';
+  for(const j in juegos){
+    const prom = juegos[j].reduce((a, b) => a + b, 0) / juegos[j].length;
+    h += '<div class="ac-barra"><span>' + j + '</span><div><i class="prom" style="width:' + (prom * 10) + '%"></i></div><b>' + prom.toFixed(1) + '</b></div>';
+  }
+  el.innerHTML = h + '</div><p class="ac-nota">Promedio de calificación por juego.</p></div>';
 }
 
 /* ---------------- 3. MONTAJE EN LA PÁGINA ---------------- */
@@ -1010,6 +1246,11 @@ function acMontar(){
   btn.onclick = acAbrir;
   btnDoc.parentNode.insertBefore(btn, btnDoc);
   acPintarNiveles();
+  acCargarAlumno();
+  if(typeof window.renderTabla === 'function'){
+    const renderOriginal = window.renderTabla;
+    window.renderTabla = function(data){ renderOriginal(data); acResumenDocente(data); };
+  }
 
   // mostrar() también debe ocultar la pantalla del acordeón
   const mostrarOriginal = window.mostrar;
