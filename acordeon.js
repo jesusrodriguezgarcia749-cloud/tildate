@@ -101,6 +101,26 @@ const AC_DIAG = {
 };
 function acMezclar(a){ const b = [...a]; for(let i = b.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
 
+/* Elige n elementos sin repetir los que ya salieron en este dispositivo,
+   hasta agotar la lista; entonces empieza un ciclo nuevo. */
+function acElegir(clave, lista, n, idf){
+  idf = idf || (x => typeof x === 'string' ? x : JSON.stringify(x));
+  const llave = 'tildate_usadas_' + clave;
+  let usados = [];
+  try { usados = JSON.parse(localStorage.getItem(llave) || '[]'); } catch(e){}
+  const vistos = new Set(usados);
+  let elegidos = acMezclar(lista.filter(x => !vistos.has(idf(x)))).slice(0, n);
+  if(elegidos.length < n){
+    const ya = new Set(elegidos.map(idf));
+    elegidos = elegidos.concat(acMezclar(lista.filter(x => !ya.has(idf(x)))).slice(0, n - elegidos.length));
+    usados = elegidos.map(idf);
+  } else {
+    usados = usados.concat(elegidos.map(idf));
+  }
+  try { localStorage.setItem(llave, JSON.stringify(usados)); } catch(e){}
+  return elegidos;
+}
+
 if(typeof module !== 'undefined'){ module.exports = { acAnalizar, acSilabear, acSinTilde }; }
 
 /* ---------------- 2. INTERFAZ ---------------- */
@@ -306,7 +326,7 @@ const AC_HTML = `
       <p class="ac-p">Se abre una hoja lista para imprimir. Para guardarla como PDF, en la ventana de impresión elige <b>Guardar como PDF</b>.</p>
       <div class="im-fila">
         <select id="im-nivel" class="ac-select"><option value="todo">Todas las palabras</option><option value="0">Agudas y graves</option><option value="1">Con esdrújulas</option><option value="2">Con sobresdrújulas</option><option value="3">Hiatos</option></select>
-        <select id="im-cant" class="ac-select"><option value="10">10 palabras</option><option value="15">15 palabras</option></select>
+        <select id="im-cant" class="ac-select"><option value="10">10 palabras</option><option value="15">15 palabras</option><option value="20">20 palabras</option><option value="30">30 palabras</option></select>
       </div>
       <div class="pz-fila">
         <button class="btn-export btn-gen-codigo" onclick="imHoja()">📝 Hoja de práctica con clave</button>
@@ -381,7 +401,7 @@ const AC_HTML = `
       <input type="text" id="du-nb" placeholder="Equipo B" class="input-full">
       <div class="im-fila">
         <select id="du-nivel" class="ac-select"><option value="todo">Todas las palabras</option><option value="0">Agudas y graves</option><option value="1">Con esdrújulas</option><option value="2">Con sobresdrújulas</option><option value="3">Hiatos</option></select>
-        <select id="du-rondas" class="ac-select"><option value="5">5 palabras</option><option value="10" selected>10 palabras</option><option value="15">15 palabras</option></select>
+        <select id="du-rondas" class="ac-select"><option value="10">10 palabras (≈15 min)</option><option value="15" selected>15 palabras (≈20 min)</option><option value="20">20 palabras (≈30 min)</option><option value="25">25 palabras (≈35 min)</option><option value="30">30 palabras (≈45 min)</option><option value="40">40 palabras (≈1 hora)</option></select>
       </div>
       <button class="btn-iniciar" onclick="duEmpezar()">⚔️ Empezar duelo</button>
     </div>
@@ -508,7 +528,7 @@ function acPintarNiveles(){
 
 function acArmarRonda(k){
   let lista = [];
-  AC_NIVELES[k].mezcla.forEach(([banco, cant]) => { lista = lista.concat(acMezclar(DB_ACORDEON[banco] || []).slice(0, cant)); });
+  AC_NIVELES[k].mezcla.forEach(([banco, cant]) => { lista = lista.concat(acElegir('prac_' + banco, DB_ACORDEON[banco] || [], cant)); });
   return acMezclar(lista).map(e => acAnalizar(e.split('-')));
 }
 
@@ -935,7 +955,7 @@ function mxEl(id){ return document.getElementById(id); }
 
 function mxArmar(modo){
   if(modo === 'cambia'){
-    return acMezclar(DB_CAMBIA).slice(0, MX_MODOS.cambia.total).map(g => {
+    return acElegir('cambia', DB_CAMBIA, MX_MODOS.cambia.total, g => g.formas[0][0]).map(g => {
       const k = Math.floor(Math.random() * g.formas.length);
       return { g, k, frase:g.frases[k] };
     });
@@ -943,13 +963,10 @@ function mxArmar(modo){
   if(modo === 'diacritica'){
     let todas = [];
     DB_DIACRITICA.forEach(p => p.frases.forEach(([frase, cual]) => todas.push({ p, frase, cual })));
-    // máximo 2 frases del mismo par por ronda
-    const cuenta = {}, ronda = [];
-    acMezclar(todas).forEach(x => { cuenta[x.p.con] = (cuenta[x.p.con] || 0); if(cuenta[x.p.con] < 2 && ronda.length < MX_MODOS.diacritica.total){ cuenta[x.p.con]++; ronda.push(x); } });
-    return ronda;
+    return acElegir('diacritica', todas, MX_MODOS.diacritica.total, x => x.frase);
   }
   const todas = [].concat(...Object.values(DB_ACORDEON));
-  return acMezclar(todas).slice(0, MX_MODOS.dictado.total).map(e => ({ w:acAnalizar(e.split('-')) }));
+  return acElegir('dictado', todas, MX_MODOS.dictado.total).map(e => ({ w:acAnalizar(e.split('-')) }));
 }
 
 function mxIniciar(modo){
@@ -1130,7 +1147,7 @@ const dt = { texto:null, tokens:[], sel:-1, revisado:false, ultimo:-1 };
 function dtIniciar(){
   acRecordarAlumno();
   mx.modo = 'detective';
-  let k; do { k = Math.floor(Math.random() * DB_DETECTIVE.length); } while(DB_DETECTIVE.length > 1 && k === dt.ultimo);
+  const k = acElegir('detective', DB_DETECTIVE.map((_, i) => i), 1, i => String(i))[0];
   dt.ultimo = k; dt.texto = DB_DETECTIVE[k];
   dt.tokens = dt.texto.texto.split(/([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)/).filter(x => x !== '').map(t => {
     const esPal = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+$/.test(t);
@@ -1325,7 +1342,7 @@ function duEmpezar(){
   du.b = mxEl('du-nb').value.trim() || 'Equipo B';
   du.rondas = +mxEl('du-rondas').value;
   const nivel = mxEl('du-nivel').value;
-  du.lista = acMezclar(duPool(nivel === 'todo' ? 'todo' : +nivel)).slice(0, du.rondas);
+  du.lista = acElegir('duelo_' + nivel, duPool(nivel === 'todo' ? 'todo' : +nivel), du.rondas);
   du.rondas = du.lista.length;
   du.pa = 0; du.pb = 0; du.i = 0;
   mxEl('du-setup').style.display = 'none';
@@ -1400,7 +1417,7 @@ function duSalir(){ clearInterval(du.reloj); acSalir(); }
 /* ---------------- HOJAS PARA IMPRIMIR ---------------- */
 function imPalabras(nivel, n){
   const pool = duPool(nivel === 'todo' ? 'todo' : +nivel).filter(e => e.split('-').length <= 4);
-  return acMezclar(pool).slice(0, n).map(e => acAnalizar(e.split('-')));
+  return acElegir('imprimir_' + nivel, pool, n).map(e => acAnalizar(e.split('-')));
 }
 const IM_CSS = `
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -1416,6 +1433,8 @@ th,td{border:1.5px solid #333;text-align:center;vertical-align:middle;}
 th{background:#eee;font-size:10pt;padding:2mm 1mm;}
 th small{display:block;font-weight:normal;font-size:7.5pt;margin-top:1mm;line-height:1.2;}
 td{height:13mm;font-size:12pt;}
+tr{page-break-inside:avoid;}
+thead{display:table-header-group;}
 td.pal{font-weight:bold;text-align:left;padding-left:2mm;font-size:12.5pt;}
 td.num{width:7mm;font-size:9pt;}
 .ton{font-weight:bold;text-decoration:underline;}
@@ -1462,10 +1481,10 @@ function imHoja(){
   const extra = '<th>¿Lleva<br>tilde?</th><th>Se escribe</th>';
   let h = imEncabezado('🪗 Mi Acordeón de Tildes · Hoja de práctica');
   h += '<p class="inst">Escribe cada sílaba en su columna, de derecha a izquierda (la última sílaba va en <b>Agudas</b>). Subraya la sílaba tónica, lee la regla de su columna y escribe la palabra correctamente.</p>';
-  h += '<table>' + imCabeceraTabla(extra) + ws.map((w, k) => imFila(w, k, false)).join('') + '</table>';
+  h += '<table><thead>' + imCabeceraTabla(extra) + '</thead><tbody>' + ws.map((w, k) => imFila(w, k, false)).join('') + '</tbody></table>';
   h += '<p class="pie">TÍLDATE · Hoja generada para práctica en clase.</p>';
   h += '<div class="salto"></div>' + '<h1>Clave de respuestas</h1><p class="inst">La sílaba tónica está subrayada.</p>';
-  h += '<table>' + imCabeceraTabla(extra) + ws.map((w, k) => imFila(w, k, true)).join('') + '</table>';
+  h += '<table><thead>' + imCabeceraTabla(extra) + '</thead><tbody>' + ws.map((w, k) => imFila(w, k, true)).join('') + '</tbody></table>';
   imAbrir(h, 'Hoja de práctica · Acordeón');
 }
 function imBlanco(){
