@@ -8,14 +8,17 @@
    aplica y si la palabra "rompe la regla" (hiato acentual).
 
    Para agregar palabras, solo escríbelas en la lista que corresponda.
+   IMPORTANTE: evita palabras que sin tilde formen OTRA palabra
+   (papá/papa, público/publico, río/rio…). Esas van en DB_CAMBIA,
+   donde la frase da el contexto.
    ===================================================================== */
 const DB_ACORDEON = {
 
   agudas: [
     /* con tilde: terminan en N, S o vocal */
-    'ca-mión','can-ción','ca-fé','so-fá','pa-pá','jar-dín','a-vión','ra-tón',
+    'ca-mión','can-ción','ca-fé','so-fá','bo-tón','jar-dín','a-vión','ra-tón',
     'co-ra-zón','ja-más','a-de-más','in-glés','bal-cón','sar-tén','co-li-brí',
-    'be-bé','ta-bú','des-pués','lec-ción','a-quí','sa-lió','co-mió',
+    'te-lón','ta-bú','des-pués','lec-ción','a-quí','sa-lió','co-mió',
     /* sin tilde: NO terminan en N, S ni vocal */
     're-loj','pa-pel','a-zul','ciu-dad','fe-liz','ver-dad','co-mer','can-tar',
     'a-mor','ca-ra-col','na-riz','a-ni-mal','se-ñor','es-pa-ñol','ca-lor',
@@ -34,10 +37,10 @@ const DB_ACORDEON = {
   ],
 
   esdrujulas: [
-    'mú-si-ca','te-lé-fo-no','quí-mi-ca','nú-me-ro','pá-ja-ro','mé-di-co',
-    'pú-bli-co','lám-pa-ra','pi-rá-mi-de','mur-cié-la-go','sá-ba-do',
+    'mú-si-ca','te-lé-fo-no','quí-mi-ca','lá-gri-ma','pá-ja-ro','bó-ve-da',
+    'pe-lí-cu-la','lám-pa-ra','pi-rá-mi-de','mur-cié-la-go','sá-ba-do',
     'miér-co-les','brú-ju-la','plá-ta-no','rá-pi-do','cá-ma-ra','ú-ni-co',
-    'sí-la-ba','pá-gi-na','re-lám-pa-go','es-tó-ma-go','há-bi-to',
+    'sí-la-ba','mé-to-do','re-lám-pa-go','es-tó-ma-go','án-gu-lo',
     'lá-pi-ces','jó-ve-nes','e-xá-me-nes','ár-bo-les','ma-te-má-ti-cas'
   ],
 
@@ -50,7 +53,7 @@ const DB_ACORDEON = {
 
   hiatos: [
     /* rompen la regla: la vocal débil (i, u) suena fuerte y lleva tilde */
-    'dí-a','rí-o','tí-a','frí-o','ma-íz','ra-íz','ba-úl','re-ír','o-ír',
+    'dí-a','son-rí-e','tí-a','frí-o','ma-íz','ra-íz','ba-úl','re-ír','o-ír',
     'le-í-do','o-í-do','ca-í-da','grú-a','ac-tú-a','re-ú-ne','po-li-cí-a',
     'ba-te-rí-a','pa-na-de-rí-a','pro-hí-be','bú-ho',
     /* hiatos que SÍ cumplen la regla (para comparar) */

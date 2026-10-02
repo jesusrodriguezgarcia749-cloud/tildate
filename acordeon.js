@@ -241,6 +241,28 @@ const AC_CSS = `
 .ac-barra i.prom{background:linear-gradient(90deg,#00e5ff,#69f0ae);}
 .ac-barra b{color:var(--amarillo);text-align:right;}
 .ac-nota{font-size:.75rem!important;color:#90a4ae!important;}
+.du-btn-abrir{background:linear-gradient(135deg,#ff5252,#ff9100);}
+.im-fila{display:flex;gap:8px;margin:8px 0;}
+.ac-select{flex:1;padding:10px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.3);background:#14262e;color:#fff;font-weight:700;font-family:'Nunito',sans-serif;font-size:.95rem;}
+.du-marcador{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:6px 0 10px;}
+.du-eq{background:rgba(0,229,255,.12);border:3px solid #00e5ff;border-radius:18px;padding:8px 6px;transition:box-shadow .3s;}
+.du-eq.b{background:rgba(255,109,0,.12);border-color:#ff9100;}
+.du-eq.gana{box-shadow:0 0 22px rgba(255,215,0,.7);}
+.du-eq.salta{animation:duSalta .45s;}
+@keyframes duSalta{0%,100%{transform:scale(1);}40%{transform:scale(1.08);}}
+.du-nombre{font-family:'Fredoka One',cursive;font-size:clamp(.9rem,3vw,1.6rem);color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.du-pts{font-family:'Fredoka One',cursive;font-size:clamp(2.4rem,9vw,5rem);color:var(--amarillo);line-height:1;}
+.du-mas{display:flex;gap:6px;justify-content:center;margin-top:6px;}
+.du-mas button{font-family:'Fredoka One',cursive;font-size:clamp(1rem,3vw,1.4rem);border:none;border-radius:12px;padding:8px 14px;background:#00c853;color:#002b0f;cursor:pointer;}
+.du-mas button.menos{background:#546e7a;color:#fff;}
+.du-centro{font-weight:800;color:#b3e5fc;font-size:clamp(.8rem,2.4vw,1.2rem);}
+.du-reloj{font-family:'Fredoka One',cursive;font-size:clamp(1.4rem,5vw,2.6rem);color:#fff;margin-top:4px;}
+.du-reloj.urge{color:#ff5252;}
+.du-resfinal{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#fff;margin:10px 0 16px;}
+#du-acc .ac-sil{font-size:clamp(1.2rem,4.6vw,2.6rem);}
+#du-acc .ac-head{font-size:clamp(.8rem,2.6vw,1.5rem);}
+#du-acc .ac-regla{font-size:clamp(.62rem,1.8vw,1rem);}
+#du-acc .ac-celda{min-height:100px;}
 @media (prefers-reduced-motion: reduce){.ac-col.fuelle,.ac-sil.cae,.ac-sil.mal{animation:none!important;}}
 `;
 
@@ -274,7 +296,22 @@ const AC_HTML = `
     <div class="form-card">
       <h2>🖥️ Pizarrón</h2>
       <p class="ac-p">Para explicar en el proyector: escribe cualquier palabra y el acordeón se arma paso a paso.</p>
-      <button class="btn-iniciar" onclick="pzAbrir()">Abrir pizarrón</button>
+      <div class="pz-fila">
+        <button class="btn-iniciar" onclick="pzAbrir()">Abrir pizarrón</button>
+        <button class="btn-iniciar du-btn-abrir" onclick="duAbrir()">⚔️ Duelo de equipos</button>
+      </div>
+    </div>
+    <div class="form-card">
+      <h2>🖨️ Para imprimir</h2>
+      <p class="ac-p">Se abre una hoja lista para imprimir. Para guardarla como PDF, en la ventana de impresión elige <b>Guardar como PDF</b>.</p>
+      <div class="im-fila">
+        <select id="im-nivel" class="ac-select"><option value="todo">Todas las palabras</option><option value="0">Agudas y graves</option><option value="1">Con esdrújulas</option><option value="2">Con sobresdrújulas</option><option value="3">Hiatos</option></select>
+        <select id="im-cant" class="ac-select"><option value="10">10 palabras</option><option value="15">15 palabras</option></select>
+      </div>
+      <div class="pz-fila">
+        <button class="btn-export btn-gen-codigo" onclick="imHoja()">📝 Hoja de práctica con clave</button>
+        <button class="btn-export btn-exp-csv" onclick="imBlanco()">🪗 Acordeón en blanco</button>
+      </div>
     </div>
     <button class="btn-accion btn-volver" onclick="volverMenu()">← Menú</button>
   </div>
@@ -334,6 +371,42 @@ const AC_HTML = `
     <div class="explicacion-box" id="mx-coach"></div>
     <button class="btn-siguiente" id="mx-btn" style="display:none;"></button>
     <div style="margin-top:12px;"><button class="btn-accion btn-volver" onclick="acSalir()">← Salir</button></div>
+  </div>
+
+  <!-- DUELO -->
+  <div id="ac-duelo" class="ac-vista">
+    <div class="ac-titulo">⚔️ Duelo de equipos</div>
+    <div id="du-setup" class="form-card">
+      <input type="text" id="du-na" placeholder="Equipo A" class="input-full">
+      <input type="text" id="du-nb" placeholder="Equipo B" class="input-full">
+      <div class="im-fila">
+        <select id="du-nivel" class="ac-select"><option value="todo">Todas las palabras</option><option value="0">Agudas y graves</option><option value="1">Con esdrújulas</option><option value="2">Con sobresdrújulas</option><option value="3">Hiatos</option></select>
+        <select id="du-rondas" class="ac-select"><option value="5">5 palabras</option><option value="10" selected>10 palabras</option><option value="15">15 palabras</option></select>
+      </div>
+      <button class="btn-iniciar" onclick="duEmpezar()">⚔️ Empezar duelo</button>
+    </div>
+    <div id="du-juego" style="display:none;">
+      <div class="du-marcador">
+        <div class="du-eq" id="du-eq-a"><div class="du-nombre" id="du-name-a"></div><div class="du-pts" id="du-pts-a">0</div>
+          <div class="du-mas"><button onclick="duPunto('a',1)">+1</button><button class="menos" onclick="duPunto('a',-1)">−1</button></div></div>
+        <div class="du-centro"><div id="du-ronda"></div><div class="du-reloj" id="du-reloj"></div></div>
+        <div class="du-eq b" id="du-eq-b"><div class="du-nombre" id="du-name-b"></div><div class="du-pts" id="du-pts-b">0</div>
+          <div class="du-mas"><button onclick="duPunto('b',1)">+1</button><button class="menos" onclick="duPunto('b',-1)">−1</button></div></div>
+      </div>
+      <div class="pz-palabra" id="du-palabra"></div>
+      <div class="ac-acordeon" id="du-acc"></div>
+      <div class="pz-explica" id="du-exp"></div>
+      <div class="pz-nav">
+        <button class="pz-oir" onclick="acOir(du.w && du.w.palabra)">🔊</button>
+        <button class="pz-next" id="du-btn" onclick="duAccion()">👀 Revelar</button>
+      </div>
+    </div>
+    <div id="du-final" class="final-card" style="display:none;">
+      <div class="ac-titulo" id="du-ganador"></div>
+      <div class="du-resfinal" id="du-resfinal"></div>
+      <button class="btn-iniciar" onclick="duAbrir()">⚔️ Otro duelo</button>
+    </div>
+    <button class="btn-accion btn-volver" onclick="duSalir()">← Mi Acordeón</button>
   </div>
 
   <!-- PIZARRÓN -->
@@ -1231,6 +1304,178 @@ function acResumenDocente(data){
     h += '<div class="ac-barra"><span>' + j + '</span><div><i class="prom" style="width:' + (prom * 10) + '%"></i></div><b>' + prom.toFixed(1) + '</b></div>';
   }
   el.innerHTML = h + '</div><p class="ac-nota">Promedio de calificación por juego.</p></div>';
+}
+
+/* ---------------- DUELO DE EQUIPOS (para el proyector) ---------------- */
+const du = { a:'Equipo A', b:'Equipo B', pa:0, pb:0, rondas:10, i:0, lista:[], w:null, revelado:false, reloj:null, seg:0 };
+function duPool(nivel){
+  const bancos = nivel === 'todo' ? Object.keys(DB_ACORDEON) : (nivel === 3 ? ['hiatos'] : [...new Set(AC_NIVELES[nivel].mezcla.map(m => m[0]))]);
+  let todas = [];
+  bancos.forEach(b => { todas = todas.concat(DB_ACORDEON[b] || []); });
+  return [...new Set(todas)];
+}
+function duAbrir(){
+  acVista('ac-duelo');
+  mxEl('du-setup').style.display = 'block';
+  mxEl('du-juego').style.display = 'none';
+  mxEl('du-final').style.display = 'none';
+}
+function duEmpezar(){
+  du.a = mxEl('du-na').value.trim() || 'Equipo A';
+  du.b = mxEl('du-nb').value.trim() || 'Equipo B';
+  du.rondas = +mxEl('du-rondas').value;
+  const nivel = mxEl('du-nivel').value;
+  du.lista = acMezclar(duPool(nivel === 'todo' ? 'todo' : +nivel)).slice(0, du.rondas);
+  du.rondas = du.lista.length;
+  du.pa = 0; du.pb = 0; du.i = 0;
+  mxEl('du-setup').style.display = 'none';
+  mxEl('du-final').style.display = 'none';
+  mxEl('du-juego').style.display = 'block';
+  mxEl('du-name-a').innerText = du.a;
+  mxEl('du-name-b').innerText = du.b;
+  duMarcador();
+  duSiguiente();
+}
+function duMarcador(){
+  mxEl('du-pts-a').innerText = du.pa;
+  mxEl('du-pts-b').innerText = du.pb;
+  mxEl('du-eq-a').classList.toggle('gana', du.pa > du.pb);
+  mxEl('du-eq-b').classList.toggle('gana', du.pb > du.pa);
+}
+function duPunto(eq, n){
+  if(eq === 'a') du.pa = Math.max(0, du.pa + n); else du.pb = Math.max(0, du.pb + n);
+  if(n > 0) sfxCorrecto();
+  duMarcador();
+  const box = mxEl('du-eq-' + eq);
+  box.classList.remove('salta'); void box.offsetWidth; box.classList.add('salta');
+}
+function duReloj(seg){
+  clearInterval(du.reloj);
+  du.seg = seg;
+  const pinta = () => {
+    mxEl('du-reloj').innerText = du.seg > 0 ? '⏱️ ' + du.seg : '⏰ ¡Tiempo!';
+    mxEl('du-reloj').classList.toggle('urge', du.seg <= 5);
+  };
+  pinta();
+  du.reloj = setInterval(() => {
+    du.seg--; pinta();
+    if(du.seg <= 0){ clearInterval(du.reloj); sfxIncorrecto(); }
+  }, 1000);
+}
+function duSiguiente(){
+  if(du.i >= du.rondas){ duFinal(); return; }
+  du.w = acAnalizar(du.lista[du.i].split('-'));
+  du.i++; du.revelado = false;
+  mxEl('du-ronda').innerText = 'Palabra ' + du.i + ' de ' + du.rondas;
+  mxEl('du-palabra').innerText = acSinTilde(du.w.palabra);
+  acRenderAcordeon(mxEl('du-acc'), du.w, {});
+  mxEl('du-exp').innerHTML = 'Cada equipo responde: <b>1)</b> ¿cuál es la sílaba tónica? <b>2)</b> ¿qué tipo de palabra es? <b>3)</b> ¿lleva tilde? · Un punto por cada acierto.';
+  mxEl('du-btn').innerText = '👀 Revelar';
+  duReloj(30);
+}
+function duAccion(){
+  if(!du.revelado){
+    du.revelado = true;
+    clearInterval(du.reloj); mxEl('du-reloj').innerText = '';
+    mxEl('du-palabra').innerHTML = acPalabraFinalHTML(du.w);
+    acRenderAcordeon(mxEl('du-acc'), du.w, { silabas:true, tonica:true, final:true, animar:true });
+    mxEl('du-exp').innerHTML = acExplicar(du.w) + ' ' + (du.w.lleva ? '✍️ <b>Lleva tilde.</b>' : '✔ <b>No lleva tilde.</b>');
+    mxEl('du-btn').innerText = du.i >= du.rondas ? '🏆 Ver ganador' : 'Siguiente palabra ▶';
+    return;
+  }
+  duSiguiente();
+}
+function duFinal(){
+  clearInterval(du.reloj);
+  mxEl('du-juego').style.display = 'none';
+  mxEl('du-final').style.display = 'block';
+  const txt = du.pa === du.pb ? '🤝 ¡Empate!' : '🏆 ¡Gana ' + (du.pa > du.pb ? du.a : du.b) + '!';
+  mxEl('du-ganador').innerText = txt;
+  mxEl('du-resfinal').innerText = du.a + ' ' + du.pa + '  ·  ' + du.b + ' ' + du.pb;
+  if(typeof mostrarComboSplash === 'function') mostrarComboSplash('🏆');
+  sfxCorrecto();
+}
+function duSalir(){ clearInterval(du.reloj); acSalir(); }
+
+/* ---------------- HOJAS PARA IMPRIMIR ---------------- */
+function imPalabras(nivel, n){
+  const pool = duPool(nivel === 'todo' ? 'todo' : +nivel).filter(e => e.split('-').length <= 4);
+  return acMezclar(pool).slice(0, n).map(e => acAnalizar(e.split('-')));
+}
+const IM_CSS = `
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,Helvetica,sans-serif;color:#111;padding:14mm 12mm;font-size:11pt;}
+h1{font-size:18pt;margin-bottom:2mm;}
+h2{font-size:13pt;margin:6mm 0 3mm;}
+.datos{display:flex;gap:6mm;margin:3mm 0 5mm;font-size:10.5pt;}
+.datos span{flex:1;border-bottom:1px solid #333;padding-bottom:1mm;}
+.inst{font-size:10pt;margin-bottom:4mm;line-height:1.4;}
+table{width:100%;border-collapse:collapse;}
+.grande{table-layout:fixed;}
+th,td{border:1.5px solid #333;text-align:center;vertical-align:middle;}
+th{background:#eee;font-size:10pt;padding:2mm 1mm;}
+th small{display:block;font-weight:normal;font-size:7.5pt;margin-top:1mm;line-height:1.2;}
+td{height:13mm;font-size:12pt;}
+td.pal{font-weight:bold;text-align:left;padding-left:2mm;font-size:12.5pt;}
+td.num{width:7mm;font-size:9pt;}
+.ton{font-weight:bold;text-decoration:underline;}
+.ok{font-weight:bold;}
+.salto{page-break-before:always;}
+.grande th{font-size:16pt;padding:4mm 2mm;}
+.grande th small{font-size:10pt;}
+.grande td{height:22mm;}
+.pie{margin-top:5mm;font-size:8.5pt;color:#555;}
+@page{size:letter;margin:0;}
+`;
+function imEncabezado(t){
+  return '<h1>' + t + '</h1><div class="datos"><span>Nombre:</span><span style="flex:.45">Grupo:</span><span style="flex:.6">Fecha:</span></div>';
+}
+function imCabeceraTabla(extra){
+  const cols = ['sobresdrujula','esdrujula','grave','aguda'].map(t => '<th>' + AC_TIPOS[t].plural + '<small>' + AC_TIPOS[t].regla.replace(/<\/?b>/g, '') + '</small></th>').join('');
+  return '<tr><th>#</th><th>Palabra</th>' + cols + extra + '</tr>';
+}
+function imFila(w, k, clave){
+  let celdas = '';
+  for(let pos = 4; pos >= 1; pos--){
+    const s = w.n - pos;
+    let txt = '';
+    if(clave && s >= 0) txt = s === w.t ? '<span class="ton">' + w.sil[s] + '</span>' : w.sil[s];
+    celdas += '<td>' + txt + '</td>';
+  }
+  const fin = clave
+    ? '<td>' + (w.lleva ? 'Sí' : 'No') + '</td><td class="ok">' + w.palabra + '</td>'
+    : '<td>Sí / No</td><td></td>';
+  return '<tr><td class="num">' + (k + 1) + '</td><td class="pal">' + acSinTilde(w.palabra) + '</td>' + celdas + fin + '</tr>';
+}
+function imAbrir(html, titulo){
+  const doc = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>' + titulo + '</title><style>' + IM_CSS + '</style></head><body>' + html
+    + '<script>window.onload=function(){setTimeout(function(){window.print();},400);};<\/script></body></html>';
+  const win = window.open('', '_blank');
+  if(!win){ showToast('⚠️ Permite las ventanas emergentes para imprimir'); return; }
+  win.document.open(); win.document.write(doc); win.document.close();
+}
+function imHoja(){
+  const nivel = mxEl('im-nivel').value;
+  const n = +mxEl('im-cant').value;
+  const ws = imPalabras(nivel, n);
+  if(!ws.length){ showToast('⚠️ No hay palabras para ese nivel'); return; }
+  const extra = '<th>¿Lleva<br>tilde?</th><th>Se escribe</th>';
+  let h = imEncabezado('🪗 Mi Acordeón de Tildes · Hoja de práctica');
+  h += '<p class="inst">Escribe cada sílaba en su columna, de derecha a izquierda (la última sílaba va en <b>Agudas</b>). Subraya la sílaba tónica, lee la regla de su columna y escribe la palabra correctamente.</p>';
+  h += '<table>' + imCabeceraTabla(extra) + ws.map((w, k) => imFila(w, k, false)).join('') + '</table>';
+  h += '<p class="pie">TÍLDATE · Hoja generada para práctica en clase.</p>';
+  h += '<div class="salto"></div>' + '<h1>Clave de respuestas</h1><p class="inst">La sílaba tónica está subrayada.</p>';
+  h += '<table>' + imCabeceraTabla(extra) + ws.map((w, k) => imFila(w, k, true)).join('') + '</table>';
+  imAbrir(h, 'Hoja de práctica · Acordeón');
+}
+function imBlanco(){
+  let h = imEncabezado('🪗 Mi Acordeón de Tildes');
+  h += '<p class="inst">Recórtalo y pégalo en tu cuaderno. Divide la palabra en sílabas, acomódalas de derecha a izquierda, encuentra la sílaba tónica y aplica la regla de su columna.</p>';
+  h += '<table class="grande"><tr>' + ['sobresdrujula','esdrujula','grave','aguda'].map(t => '<th>' + AC_TIPOS[t].plural + '<small>' + AC_TIPOS[t].regla.replace(/<\/?b>/g, '') + '</small></th>').join('') + '</tr>';
+  for(let r = 0; r < 8; r++) h += '<tr><td></td><td></td><td></td><td></td></tr>';
+  h += '</table>';
+  h += '<h2>¡Ojo con los hiatos!</h2><p class="inst">Si la vocal débil (i, u) suena más fuerte que la vocal fuerte (a, e, o) que está a su lado, se separan en sílabas distintas y la débil <b>siempre lleva tilde</b>, aunque la regla diga que no: día, baúl, maíz, policía, búho.</p>';
+  imAbrir(h, 'Acordeón en blanco');
 }
 
 /* ---------------- 3. MONTAJE EN LA PÁGINA ---------------- */
