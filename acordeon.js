@@ -186,6 +186,29 @@ const AC_CSS = `
 .pz-next{background:linear-gradient(135deg,var(--amarillo),var(--naranja));color:#1a0000;}
 .pz-oir{background:rgba(0,229,255,.18);color:#e1f5fe;border:1px solid rgba(0,229,255,.5)!important;}
 .pz-paso{font-weight:800;color:#b3e5fc;font-size:.95rem;}
+.mx-desc{display:block;font-size:.75rem;color:#b3e5fc;font-weight:700;}
+.mx-frase{font-family:'Nunito',sans-serif;font-weight:800;font-size:clamp(1.25rem,5vw,1.9rem);line-height:1.45;color:#fff;}
+.mx-hueco{display:inline-block;min-width:3.5em;border-bottom:3px dashed var(--amarillo);color:transparent;}
+.mx-ok{color:#69f0ae;}
+.mx-mal{color:#ff8a80;text-decoration:line-through;}
+.mx-tu{font-weight:700;color:#cfd8dc;margin-bottom:6px;}
+.mx-comp{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
+.mx-fila{border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:8px 10px;background:rgba(0,0,0,.25);text-align:left;}
+.mx-fila.ok{border-color:#69f0ae;background:rgba(0,200,83,.12);}
+.mx-pal{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:#fff;}
+.mx-pal .ton{color:var(--amarillo);}
+.mx-pal .tilde{color:#ff6d00;}
+.mx-sig{font-size:.88rem;color:#e1f5fe;font-weight:700;}
+.mx-sig i{color:#b3e5fc;}
+.ac-mini{margin:6px 0 0;border-width:1px;box-shadow:none;}
+.ac-mini .ac-regla{display:none;}
+.ac-mini .ac-head{font-size:.62rem;padding:4px 1px;}
+.ac-mini .ac-celda{min-height:44px;padding:4px 2px;}
+.ac-mini .ac-sil{font-size:1rem;padding:3px 6px;border-radius:8px;}
+.mx-oir-grande{font-family:'Fredoka One',cursive;font-size:1.3rem;padding:12px 26px;border:none;border-radius:50px;background:linear-gradient(135deg,#00e5ff,#00b0ff);color:#00222b;cursor:pointer;}
+.mx-input{text-align:center;font-size:1.6rem!important;margin:12px 0 6px!important;}
+.mx-teclas{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
+.mx-teclas button{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.25rem;width:40px;height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;}
 @media (prefers-reduced-motion: reduce){.ac-col.fuelle,.ac-sil.cae,.ac-sil.mal{animation:none!important;}}
 `;
 
@@ -199,6 +222,14 @@ const AC_HTML = `
       <h2>🎒 Práctica</h2>
       <p class="ac-p">Elige tu nivel. Cada ronda tiene 10 palabras.</p>
       <div class="ac-niveles" id="ac-niveles"></div>
+    </div>
+    <div class="form-card">
+      <h2>🎯 Más juegos</h2>
+      <div class="ac-niveles">
+        <button class="ac-nivel" onclick="mxIniciar('cambia')"><span class="num">🔀</span><span>La tilde cambia el significado<small class="mx-desc">término, termino, terminó</small></span></button>
+        <button class="ac-nivel" onclick="mxIniciar('dictado')"><span class="num">🎧</span><span>Dictado<small class="mx-desc">escucha y escribe con tilde</small></span></button>
+        <button class="ac-nivel" onclick="mxIniciar('diacritica')"><span class="num">✋</span><span>Tilde diacrítica<small class="mx-desc">tú / tu, sí / si, qué / que…</small></span></button>
+      </div>
     </div>
     <div class="form-card">
       <h2>🖥️ Pizarrón</h2>
@@ -246,6 +277,22 @@ const AC_HTML = `
       </div>
       <button class="btn-accion btn-volver" onclick="acSalir()">← Mi Acordeón</button>
     </div>
+  </div>
+
+  <!-- MÁS JUEGOS -->
+  <div id="ac-mas" class="ac-vista">
+    <div class="hud">
+      <div class="hud-modo" id="mx-titulo"></div>
+      <div class="hud-score">⭐ <span id="mx-pts">0</span></div>
+      <div class="hud-modo" id="mx-prog"></div>
+    </div>
+    <div class="combo-display" id="mx-combo"></div>
+    <div class="palabra-card" id="mx-card"></div>
+    <div id="mx-opc"></div>
+    <div id="mx-vis"></div>
+    <div class="explicacion-box" id="mx-coach"></div>
+    <button class="btn-siguiente" id="mx-btn" style="display:none;"></button>
+    <div style="margin-top:12px;"><button class="btn-accion btn-volver" onclick="acSalir()">← Salir</button></div>
   </div>
 
   <!-- PIZARRÓN -->
@@ -744,6 +791,210 @@ function pzPintar(avanzando){
     'Se escribe <b>' + w.palabra + '</b>: palabra ' + info.nombre + (w.lleva ? ' con tilde.' : ' sin tilde.')
   ];
   exp.innerHTML = textos[p];
+}
+
+/* ---------------- MÁS JUEGOS: cambia el significado, dictado, diacrítica ---------------- */
+const MX_MODOS = {
+  cambia:     { titulo:'LA TILDE CAMBIA', total:8 },
+  dictado:    { titulo:'DICTADO', total:10 },
+  diacritica: { titulo:'DIACRÍTICA', total:10 }
+};
+const mx = { modo:'', items:[], i:0, pts:0, aciertos:0, racha:0, maxRacha:0, listo:false, item:null };
+
+function acExplicar(w){
+  const info = AC_TIPOS[w.tipo];
+  const fin = { vocal:'en vocal', n:'en N', s:'en S', otra:'en otra consonante' }[w.termina];
+  let t = '«<b>' + w.palabra + '</b>» es palabra <b>' + info.nombre + '</b> (sílaba tónica: «' + w.sil[w.t] + '»)';
+  if(w.tipo === 'aguda' || w.tipo === 'grave') t += ' y termina ' + fin;
+  t += '. Regla: ' + info.regla + '.';
+  if(w.rompe) t += w.hiato ? ' 🚨 Pero tiene <b>hiato acentual</b>: rompe la regla y lleva tilde.' : ' 🚨 Es una excepción a la regla.';
+  return t;
+}
+function mxCap(palabra, frase){ return /^[¿¡]?___/.test(frase) ? palabra.charAt(0).toUpperCase() + palabra.slice(1) : palabra; }
+function mxFrase(frase, relleno){ return frase.replace('___', relleno); }
+function mxEl(id){ return document.getElementById(id); }
+
+function mxArmar(modo){
+  if(modo === 'cambia'){
+    return acMezclar(DB_CAMBIA).slice(0, MX_MODOS.cambia.total).map(g => {
+      const k = Math.floor(Math.random() * g.formas.length);
+      return { g, k, frase:g.frases[k] };
+    });
+  }
+  if(modo === 'diacritica'){
+    let todas = [];
+    DB_DIACRITICA.forEach(p => p.frases.forEach(([frase, cual]) => todas.push({ p, frase, cual })));
+    // máximo 2 frases del mismo par por ronda
+    const cuenta = {}, ronda = [];
+    acMezclar(todas).forEach(x => { cuenta[x.p.con] = (cuenta[x.p.con] || 0); if(cuenta[x.p.con] < 2 && ronda.length < MX_MODOS.diacritica.total){ cuenta[x.p.con]++; ronda.push(x); } });
+    return ronda;
+  }
+  const todas = [].concat(...Object.values(DB_ACORDEON));
+  return acMezclar(todas).slice(0, MX_MODOS.dictado.total).map(e => ({ w:acAnalizar(e.split('-')) }));
+}
+
+function mxIniciar(modo){
+  Object.assign(mx, { modo, items:mxArmar(modo), i:0, pts:0, aciertos:0, racha:0, maxRacha:0 });
+  mxEl('mx-titulo').innerText = MX_MODOS[modo].titulo;
+  mxEl('mx-pts').innerText = '0';
+  mxEl('mx-combo').innerText = '';
+  acVista('ac-mas');
+  iniciarMusica('estudio');
+  mxSiguiente();
+}
+function mxLimpiar(){
+  ['mx-card','mx-opc','mx-vis','mx-coach'].forEach(id => mxEl(id).innerHTML = '');
+  mxEl('mx-btn').style.display = 'none';
+}
+function mxSiguiente(){
+  if(mx.i >= mx.items.length){ mxFinal(); return; }
+  mx.item = mx.items[mx.i]; mx.i++; mx.listo = false;
+  mxEl('mx-prog').innerText = mx.i + ' de ' + mx.items.length;
+  mxLimpiar();
+  if(mx.modo === 'cambia') mxPintarCambia();
+  else if(mx.modo === 'diacritica') mxPintarDiacritica();
+  else mxPintarDictado();
+}
+function mxResultado(ok){
+  mx.listo = true;
+  if(ok){
+    sfxCorrecto();
+    mx.aciertos++; mx.racha++; mx.maxRacha = Math.max(mx.maxRacha, mx.racha);
+    mx.pts += 20 + (mx.racha >= 3 ? 10 * mx.racha : 0);
+    if(mx.racha >= 3 && typeof mostrarComboSplash === 'function') mostrarComboSplash('🔥 x' + mx.racha);
+  } else { sfxIncorrecto(); mx.racha = 0; }
+  mxEl('mx-pts').innerText = mx.pts;
+  mxEl('mx-combo').innerText = mx.racha >= 2 ? '🔥 Racha x' + mx.racha : '';
+  const b = mxEl('mx-btn');
+  b.innerText = mx.i >= mx.items.length ? 'Ver resultados' : 'Siguiente';
+  b.style.display = 'inline-block';
+  b.onclick = mxSiguiente;
+}
+function mxOpciones(lista, alElegir){
+  const cont = document.createElement('div');
+  cont.className = 'ac-opciones';
+  if(lista.length === 1) cont.style.gridTemplateColumns = '1fr';
+  lista.forEach(([etq, val]) => {
+    const b = document.createElement('button');
+    b.className = 'opt'; b.innerText = etq; b.dataset.v = String(val);
+    b.onclick = () => { if(mx.listo) return; alElegir(val, b, cont); };
+    cont.appendChild(b);
+  });
+  mxEl('mx-opc').innerHTML = ''; mxEl('mx-opc').appendChild(cont);
+}
+function mxMarcar(cont, correcta, btn, ok){
+  cont.querySelectorAll('.opt').forEach(x => { x.disabled = true; if(x.dataset.v === String(correcta)) x.classList.add(ok ? 'correct' : 'show-correct'); });
+  if(!ok) btn.classList.add('incorrect');
+}
+
+/* 1) La tilde cambia el significado */
+function mxPintarCambia(){
+  const { g, frase } = mx.item;
+  mxEl('mx-card').innerHTML = '<div class="mx-frase">' + mxFrase(frase, '<span class="mx-hueco">______</span>') + '</div>';
+  mxEl('mx-coach').innerHTML = '🔀 Las tres se escriben con las mismas letras. ¿Cuál completa la frase?';
+  const ops = acMezclar(g.formas.map((f, k) => [mxCap(f[0].replace(/-/g, ''), frase), k]));
+  mxOpciones(ops, (val, btn, cont) => {
+    const ok = val === mx.item.k;
+    mxMarcar(cont, mx.item.k, btn, ok);
+    const correcta = mxCap(g.formas[mx.item.k][0].replace(/-/g, ''), frase);
+    mxEl('mx-card').innerHTML = '<div class="mx-frase">' + mxFrase(frase, '<b class="mx-ok">' + correcta + '</b>') + '</div>';
+    let h = '<div class="mx-comp">';
+    g.formas.forEach((f, k) => {
+      const w = acAnalizar(f[0].split('-'));
+      h += '<div class="mx-fila' + (k === mx.item.k ? ' ok' : '') + '"><div class="mx-pal">' + acPalabraFinalHTML(w) + '</div>'
+         + '<div class="mx-sig">' + f[1] + ' · <i>' + AC_TIPOS[w.tipo].nombre + '</i></div>'
+         + '<div class="ac-acordeon ac-mini" id="mx-acc-' + k + '"></div></div>';
+    });
+    mxEl('mx-vis').innerHTML = h + '</div>';
+    g.formas.forEach((f, k) => acRenderAcordeon(mxEl('mx-acc-' + k), acAnalizar(f[0].split('-')), { silabas:true, tonica:true, final:true }));
+    mxEl('mx-coach').innerHTML = (ok ? '🎯 ¡Exacto! ' : '❌ Aquí va «<b>' + correcta + '</b>». ')
+      + 'Mira los acordeones: las letras son las mismas, pero la sílaba tónica cambia de columna… y con ella cambia el significado.';
+    mxResultado(ok);
+  });
+}
+
+/* 2) Dictado */
+function mxDecir(lento){
+  const w = mx.item && mx.item.w;
+  if(!w) return;
+  if(!('speechSynthesis' in window)){ showToast('🔇 Este dispositivo no tiene voz'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(w.palabra);
+  u.lang = 'es-MX'; u.rate = lento ? 0.5 : 0.8;
+  const v = speechSynthesis.getVoices().find(x => /^es/i.test(x.lang));
+  if(v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+function mxTecla(c){
+  const inp = mxEl('mx-input');
+  if(!inp || inp.disabled) return;
+  const a = inp.selectionStart ?? inp.value.length, b = inp.selectionEnd ?? inp.value.length;
+  inp.value = inp.value.slice(0, a) + c + inp.value.slice(b);
+  inp.focus(); inp.setSelectionRange(a + 1, a + 1);
+}
+function mxPintarDictado(){
+  const sinVoz = !('speechSynthesis' in window);
+  mxEl('mx-card').innerHTML =
+    '<div class="pz-fila"><button class="mx-oir-grande" onclick="mxDecir(false)">🔊 Escuchar</button>'
+    + '<button class="ac-oir" onclick="mxDecir(true)">🐢 Más lento</button></div>'
+    + '<input type="text" id="mx-input" class="input-full mx-input" placeholder="Escribe la palabra" autocomplete="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key===\'Enter\')mxRevisarDictado()">'
+    + '<div class="mx-teclas">' + ['á','é','í','ó','ú','ü','ñ'].map(c => '<button onclick="mxTecla(\'' + c + '\')">' + c + '</button>').join('') + '</div>'
+    + (sinVoz ? '<div class="pz-aviso">🔇 Este dispositivo no tiene voz. Pide a alguien que te dicte: <button class="ac-oir" onclick="this.outerHTML=\'<b>\'+mx.item.w.palabra+\'</b>\'">👀 Mostrar a quien dicta</button></div>' : '');
+  mxEl('mx-coach').innerHTML = '🎧 Escucha la palabra y escríbela. Cuida la tilde: si la lleva, ¡ponla!';
+  mxOpciones([['Revisar', 'r']], () => mxRevisarDictado());
+  if(!sinVoz) setTimeout(() => mxDecir(false), 350);
+}
+function mxRevisarDictado(){
+  if(mx.listo) return;
+  const inp = mxEl('mx-input');
+  const r = inp.value.trim().toLowerCase();
+  if(!r){ showToast('✏️ Escribe la palabra primero'); return; }
+  const w = mx.item.w;
+  const ok = r === w.palabra;
+  const casi = !ok && acSinTilde(r) === acSinTilde(w.palabra);
+  inp.disabled = true;
+  mxEl('mx-opc').innerHTML = '';
+  mxEl('mx-card').innerHTML = '<div class="mx-tu">Escribiste: <b class="' + (ok ? 'mx-ok' : 'mx-mal') + '">' + r + '</b></div>'
+    + '<div class="ac-final">' + acPalabraFinalHTML(w) + '</div>';
+  mxEl('mx-vis').innerHTML = '<div class="ac-acordeon" id="mx-acc-d"></div>';
+  acRenderAcordeon(mxEl('mx-acc-d'), w, { silabas:true, tonica:true, final:true, animar:true });
+  const inicio = ok ? '🎉 ¡Perfecto! ' : (casi ? '🤏 ¡Casi! Las letras están bien, pero la tilde no. ' : '❌ Se escribe así. ');
+  mxEl('mx-coach').innerHTML = inicio + acExplicar(w);
+  mxResultado(ok);
+}
+
+/* 3) Tilde diacrítica */
+function mxPintarDiacritica(){
+  const { p, frase, cual } = mx.item;
+  mxEl('mx-card').innerHTML = '<div class="mx-frase">' + mxFrase(frase, '<span class="mx-hueco">____</span>') + '</div>';
+  mxEl('mx-coach').innerHTML = '✋ Se escriben igual, pero no significan lo mismo. ¿Cuál va aquí?';
+  const ops = acMezclar([[mxCap(p.con, frase), 'con'], [mxCap(p.sin, frase), 'sin']]);
+  mxOpciones(ops, (val, btn, cont) => {
+    const ok = val === cual;
+    mxMarcar(cont, cual, btn, ok);
+    const correcta = mxCap(cual === 'con' ? p.con : p.sin, frase);
+    mxEl('mx-card').innerHTML = '<div class="mx-frase">' + mxFrase(frase, '<b class="mx-ok">' + correcta + '</b>') + '</div>';
+    mxEl('mx-vis').innerHTML = '<div class="mx-comp">'
+      + '<div class="mx-fila' + (cual === 'con' ? ' ok' : '') + '"><div class="mx-pal">' + p.con + '</div><div class="mx-sig">' + p.conSig + '</div></div>'
+      + '<div class="mx-fila' + (cual === 'sin' ? ' ok' : '') + '"><div class="mx-pal">' + p.sin + '</div><div class="mx-sig">' + p.sinSig + '</div></div></div>';
+    const sig = cual === 'con' ? p.conSig : p.sinSig;
+    mxEl('mx-coach').innerHTML = (ok ? '🎯 ¡Correcto! ' : '❌ Aquí va «<b>' + correcta + '</b>». ')
+      + 'En esta frase es ' + sig + '. Esta tilde se llama <b>diacrítica</b>: sirve para distinguir palabras que se escriben igual.';
+    mxResultado(ok);
+  });
+}
+
+function mxFinal(){
+  mxLimpiar();
+  const n = mx.items.length;
+  const titulo = mx.aciertos === n ? '¡Ronda perfecta!' : (mx.aciertos >= n * 0.7 ? '¡Muy bien!' : '¡Ronda terminada!');
+  mxEl('mx-card').innerHTML = '<div class="ac-titulo">' + titulo + '</div><div class="ac-res">'
+    + '<div><b>' + mx.pts + '</b><small>puntos</small></div>'
+    + '<div><b>' + mx.aciertos + '/' + n + '</b><small>aciertos</small></div>'
+    + '<div><b>' + mx.maxRacha + '</b><small>mejor racha</small></div></div>';
+  mxEl('mx-opc').innerHTML = '<div class="pz-fila"><button class="btn-accion btn-guardar" onclick="mxIniciar(mx.modo)">🔁 Otra ronda</button>'
+    + '<button class="btn-accion btn-volver" onclick="acSalir()">← Mi Acordeón</button></div>';
+  mxEl('mx-prog').innerText = '';
 }
 
 /* ---------------- 3. MONTAJE EN LA PÁGINA ---------------- */

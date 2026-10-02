@@ -57,3 +57,75 @@ const DB_ACORDEON = {
     'pa-ís','le-ón','po-e-ta','ca-er','te-a-tro','a-é-re-o','pe-or','ma-es-tro'
   ]
 };
+
+/* =====================================================================
+   LA TILDE CAMBIA EL SIGNIFICADO
+   Cada grupo: formas [palabra separada en sílabas, significado]
+   y una frase por forma (en el mismo orden). ___ marca el hueco.
+   ===================================================================== */
+const DB_CAMBIA = [
+  { formas:[['tér-mi-no','el final o límite de algo'],['ter-mi-no','yo lo acabo (ahora)'],['ter-mi-nó','él o ella lo acabó (antes)']],
+    frases:['El ___ del partido llegó muy rápido.','Siempre ___ la tarea antes de cenar.','Mi hermana ___ el libro anoche.'] },
+  { formas:[['prác-ti-co','que sirve o es útil'],['prac-ti-co','yo hago práctica (ahora)'],['prac-ti-có','él o ella hizo práctica (antes)']],
+    frases:['Este cuaderno es muy ___ para la escuela.','Todos los días ___ con mi guitarra.','Ayer Ana ___ su discurso frente al espejo.'] },
+  { formas:[['pú-bli-co','las personas que ven algo, o lo que es para todos'],['pu-bli-co','yo doy a conocer algo (ahora)'],['pu-bli-có','él o ella dio a conocer algo (antes)']],
+    frases:['El ___ aplaudió al terminar la obra.','Cada semana ___ un video en mi canal.','El periódico ___ la noticia ayer.'] },
+  { formas:[['cál-cu-lo','una operación matemática'],['cal-cu-lo','yo saco la cuenta (ahora)'],['cal-cu-ló','él o ella sacó la cuenta (antes)']],
+    frases:['Hice el ___ del área en mi libreta.','Con la calculadora ___ el total.','La maestra ___ el promedio del grupo.'] },
+  { formas:[['á-ni-mo','las ganas o el buen humor'],['a-ni-mo','yo doy apoyo (ahora)'],['a-ni-mó','él o ella dio apoyo (antes)']],
+    frases:['Hoy amanecí con mucho ___.','Desde la tribuna ___ a mi equipo.','El entrenador ___ a los jugadores en el medio tiempo.'] },
+  { formas:[['tí-tu-lo','el nombre de un libro o un diploma'],['ti-tu-lo','yo le pongo nombre (ahora)'],['ti-tu-ló','él o ella le puso nombre (antes)']],
+    frases:['Escribe el ___ con letra grande.','Siempre ___ mis dibujos antes de entregarlos.','El autor ___ su novela «El viaje».'] },
+  { formas:[['lí-mi-te','la orilla o el final de algo'],['li-mi-te','que yo ponga un tope'],['li-mi-té','yo puse un tope (antes)']],
+    frases:['El río marca el ___ entre los dos terrenos.','Mi mamá me pide que ___ el tiempo en el celular.','Ayer ___ mis horas de videojuegos.'] },
+  { formas:[['crí-ti-co','quien opina o juzga algo'],['cri-ti-co','yo hablo mal de algo (ahora)'],['cri-ti-có','él o ella habló mal de algo (antes)']],
+    frases:['El ___ de cine escribió una reseña.','Yo no ___ a mis compañeros: mejor los ayudo.','El vecino ___ el ruido de la fiesta.'] },
+  { formas:[['de-pó-si-to','un lugar donde se guarda algo'],['de-po-si-to','yo guardo o meto dinero (ahora)'],['de-po-si-tó','él o ella guardó o metió dinero (antes)']],
+    frases:['Llenaron el ___ de agua.','Cada quincena ___ mis ahorros en el banco.','Mi tía ___ el dinero en su cuenta.'] },
+  { formas:[['cé-le-bre','famoso'],['ce-le-bre','que yo festeje'],['ce-le-bré','yo festejé (antes)']],
+    frases:['Frida Kahlo es una pintora ___.','Mi abuela quiere que ___ mi cumpleaños con ella.','El sábado ___ mi cumpleaños con mis primos.'] },
+  { formas:[['con-ti-nuo','que no se detiene'],['con-ti-nú-o','yo sigo (ahora)'],['con-ti-nuó','él o ella siguió (antes)']],
+    frases:['Se escuchaba un ruido ___ toda la noche.','Después del descanso, ___ con la lectura.','La lluvia ___ hasta la madrugada.'] },
+  { formas:[['pa-pa','el tubérculo que se come'],['pa-pá','el padre']],
+    frases:['Puse una ___ a cocer.','Mi ___ me lleva a la escuela.'] },
+  { formas:[['sá-ba-na','la tela que cubre la cama'],['sa-ba-na','una llanura con pasto']],
+    frases:['Cambié la ___ de mi cama.','Las jirafas viven en la ___ africana.'] },
+  { formas:[['es-ta','señala algo cercano (esta mochila)'],['es-tá','del verbo estar']],
+    frases:['___ mochila es nueva.','Mi perro ___ dormido en el patio.'] },
+  { formas:[['se-cre-ta-ria','la persona que trabaja en una oficina'],['se-cre-ta-rí-a','la oficina o dependencia']],
+    frases:['La ___ de la dirección nos dio los horarios.','Fui a la ___ de Educación por mi certificado.'] },
+  { formas:[['cor-tes','plural de corte'],['cor-tés','amable, educado']],
+    frases:['Me hice dos ___ con el papel.','El niño fue muy ___ con la visita.'] }
+];
+
+/* =====================================================================
+   TILDE DIACRÍTICA
+   con = forma con tilde, sin = forma sin tilde.
+   Cada frase indica cuál va: 'con' o 'sin'. ___ marca el hueco.
+   ===================================================================== */
+const DB_DIACRITICA = [
+  { con:'tú', sin:'tu', conSig:'pronombre: la persona (tú cantas)', sinSig:'posesivo: lo que es tuyo (tu casa)',
+    frases:[['___ eres el siguiente en pasar.','con'],['¿Ya trajiste ___ cuaderno?','sin'],['¿Vienes ___ al partido?','con'],['___ letra es muy clara.','sin']] },
+  { con:'él', sin:'el', conSig:'pronombre: un hombre o un niño (él juega)', sinSig:'artículo: va antes de un sustantivo (el balón)',
+    frases:[['Ese regalo es para ___.','con'],['___ autobús llegó tarde.','sin'],['Mi primo dice que ___ ganó la carrera.','con'],['Dejé ___ libro en la mesa.','sin']] },
+  { con:'mí', sin:'mi', conSig:'pronombre, después de una preposición (para mí)', sinSig:'posesivo o nota musical (mi casa)',
+    frases:[['¿Esta carta es para ___?','con'],['___ mamá trabaja en un hospital.','sin'],['A ___ me gustan los tacos.','con'],['Olvidé ___ mochila en el salón.','sin']] },
+  { con:'sí', sin:'si', conSig:'afirmación (sí quiero)', sinSig:'condición (si llueve, no salgo)',
+    frases:[['___ estudias, vas a aprobar.','sin'],['Le pregunté y me dijo que ___.','con'],['No sé ___ podré ir mañana.','sin'],['¡Claro que ___ voy a la excursión!','con']] },
+  { con:'más', sin:'mas', conSig:'cantidad (más agua)', sinSig:'significa «pero» (casi no se usa)',
+    frases:[['Quiero ___ agua, por favor.','con'],['Corrí ___ rápido que ayer.','con'],['Lo intentó, ___ no pudo lograrlo.','sin']] },
+  { con:'té', sin:'te', conSig:'la bebida (un té caliente)', sinSig:'pronombre (te quiero)',
+    frases:[['Mi abuela prepara ___ de canela.','con'],['¿___ ayudo con la tarea?','sin'],['___ espero a la salida.','sin'],['Me tomé un ___ de manzanilla.','con']] },
+  { con:'dé', sin:'de', conSig:'del verbo dar (que me dé)', sinSig:'preposición (la casa de Ana)',
+    frases:[['Pídele que te ___ la hoja.','con'],['La mochila ___ Luis es azul.','sin'],['Ojalá el maestro nos ___ más tiempo.','con'],['Tengo un vaso ___ agua.','sin']] },
+  { con:'sé', sin:'se', conSig:'del verbo saber (yo sé)', sinSig:'pronombre (se fue)',
+    frases:[['Yo ___ la respuesta.','con'],['El gato ___ subió al árbol.','sin'],['No ___ dónde dejé mis llaves.','con'],['Mi tío ___ compró un carro.','sin']] },
+  { con:'qué', sin:'que', conSig:'pregunta o exclamación (¿qué haces?)', sinSig:'une dos ideas (dijo que vendría)',
+    frases:[['¿___ hora es?','con'],['Me dijo ___ llegaría tarde.','sin'],['¡___ bonito día!','con'],['No sé ___ hacer con este problema.','con'],['El libro ___ me prestaste es increíble.','sin']] },
+  { con:'cómo', sin:'como', conSig:'pregunta por la manera (¿cómo estás?)', sinSig:'compara o es del verbo comer (como pan)',
+    frases:[['¿___ te llamas?','con'],['Tengo hambre, por eso ___ mucho.','sin'],['Explícame ___ resolviste el ejercicio.','con'],['Corre ___ el viento.','sin']] },
+  { con:'dónde', sin:'donde', conSig:'pregunta por el lugar (¿dónde estás?)', sinSig:'señala un lugar, sin preguntar (vivo donde empieza el camino)',
+    frases:[['¿___ está mi lápiz?','con'],['Vivo ___ empieza la carretera.','sin'],['No recuerdo ___ dejé mi suéter.','con'],['La tienda ___ compramos el pan ya cerró.','sin']] },
+  { con:'cuándo', sin:'cuando', conSig:'pregunta por el tiempo (¿cuándo llegas?)', sinSig:'señala un momento, sin preguntar (cuando llegues, avísame)',
+    frases:[['¿___ es tu cumpleaños?','con'],['___ termine la clase, salimos al patio.','sin'],['Avísame ___ llegues a tu casa.','sin'],['Pregúntale ___ es el examen.','con']] }
+];
